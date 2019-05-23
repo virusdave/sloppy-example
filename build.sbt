@@ -103,7 +103,7 @@ lazy val db_all = project
   )
 
 lazy val sloppy = {
-  val commit = "9644276"
+  val commit = "6af54c2"
   ProjectRef(uri(s"https://github.com/virusdave/sloppy.git#${commit}"), "sloppy")
 }
 

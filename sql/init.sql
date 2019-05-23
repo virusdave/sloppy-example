@@ -1,28 +1,5 @@
 -- Create an initial table and populate it with some data.
 
-DROP TABLE IF EXISTS public.scratch_test_table
-;
-CREATE TABLE public.scratch_test_table
-(
-  some_pkey serial NOT NULL,
-  some_text text,
-  some_integer integer,
-  some_boolean boolean NOT NULL DEFAULT false,
-  CONSTRAINT scratch_test_table_some_pkey PRIMARY KEY (some_pkey)
-)
-WITH (
-  OIDS=FALSE
-);
-
-INSERT INTO scratch_test_table(some_text, some_integer, some_boolean)
-VALUES
-(NULL, 1234, TRUE),
-('Hello, world', NULL, FALSE),
-('Needs moar cowbell', 42, TRUE)
-;
-
-
-
 DROP TABLE IF EXISTS public.users
 ;
 CREATE TABLE public.users
@@ -36,6 +13,23 @@ CREATE TABLE public.users
 WITH (
   OIDS=FALSE
 );
+
+
+DROP TABLE IF EXISTS public.relationships
+;
+CREATE TABLE public.relationships
+(
+    id serial NOT NULL,
+    "from" text NOT NULL,
+    "to" text NOT NULL,
+    "rel_type" text NOT NULL DEFAULT 'FRIEND',
+
+    CONSTRAINT relationships_id PRIMARY KEY (id)
+)
+WITH (
+  OIDS=FALSE
+);
+
 
 INSERT INTO users(name, sex)
 VALUES
@@ -155,22 +149,6 @@ CREATE INDEX "users_BY_name"
   USING btree
   (name COLLATE pg_catalog."default");
 
-
-
-DROP TABLE IF EXISTS public.relationships
-;
-CREATE TABLE public.relationships
-(
-    id serial NOT NULL,
-    "from" text NOT NULL,
-    "to" text NOT NULL,
-    "rel_type" text NOT NULL DEFAULT 'FRIEND',
-
-    CONSTRAINT relationships_id PRIMARY KEY (id)
-)
-WITH (
-  OIDS=FALSE
-);
 
 INSERT INTO relationships("from", "to", "rel_type")
 VALUES
