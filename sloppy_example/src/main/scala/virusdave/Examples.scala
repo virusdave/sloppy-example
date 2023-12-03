@@ -1,4 +1,4 @@
-package virusdave
+package virusdave  // FS:16
 
 import scala.concurrent.duration._
 import scala.concurrent.Await
@@ -10,10 +10,10 @@ import virusdave.Queries._
 
 object Examples {
   def main(args: Array[String]): Unit = {
-    println("\n\n")
+    println("\n\n\n")
 
     /**
-      * 1) Simple use of just Slick: Find Arya in the users
+      * 1) Simple use of just Slick: Find Stark children in the users
       */
     val users = Users.map { row =>
       PersonLift(id = row.id, name = row.name, sex = row.sex)
@@ -21,9 +21,15 @@ object Examples {
 
     val arya = users.filter(_.name === "Arya")
     val sansa = users.filter(_.name === "Sansa")
+    val starkDaughters = arya ++ sansa
+
 
 //    print("arya", arya.result.head)
 //    print("sansa", sansa.result.head)
+//    prints("starks", starkDaughters.result)
+
+
+
 
 
 
@@ -38,6 +44,13 @@ object Examples {
 
 
 
+
+
+
+
+
+
+
     /**
       * 3) Use the generalized version of "linked user" appender
       *    (But still find Arya's peoples)
@@ -48,14 +61,24 @@ object Examples {
 
 
 
+
+
+
+
+
     /**
       * 4) Use the generalized version to find siblings
       */
     // ...but who are her siblings?
     val siblings = AddLinkedPersons("BROTHER", "SISTER") // ****
 
-    val aryaSiblings = arya.byUsing(_.name).append(siblings)
-//    prints("arya siblings", aryaSiblings.result)
+    val starkSiblings = starkDaughters.byUsing(_.name).append(siblings)
+//    prints("arya siblings", starkSiblings.result)
+
+
+
+
+
 
 
 
@@ -74,6 +97,12 @@ object Examples {
 
 
 
+
+
+
+
+
+
     /**
       * 6) That can also be done via composition of appenders
       */
@@ -83,6 +112,10 @@ object Examples {
     val aryaFriendsOfParents2 =
       arya.byUsing(_.name).append(addFriendsOfParents)
 //    prints("arya friends of parents 2", aryaFriendsOfParents2.result)
+
+
+
+
 
 
 
@@ -112,6 +145,11 @@ object Examples {
 
 
 
+
+
+
+
+
     /**
       * 8) Compositions with filtering
       */
@@ -125,6 +163,13 @@ object Examples {
 
     prints("Popular people", popularPeople.result)
     prints("Social Elite", popularPeoplesPopularPeople.result)
+
+
+
+
+
+
+
 
 
 
@@ -155,11 +200,23 @@ object Examples {
 //      fromJustTheMen.result)
 
 
-    // What does that SQL actually look like?
+//     What does that SQL actually look like?
     println(s"SQL:\n  ${fromJustTheMen.result.statements.head}")
 
-
+    println("\n\n\n")
   }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -184,3 +241,5 @@ object Examples {
       "jdbc:postgresql://localhost/dave", "dave", "dave", keepAliveConnection = true)
   }
 }
+
+// Prior font size: 16

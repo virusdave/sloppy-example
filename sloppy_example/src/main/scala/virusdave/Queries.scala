@@ -8,9 +8,11 @@ import virusdave.db.gen.Tables._
 object Queries {
   import sloppy.QueryCompositionOps._
 
+
+
   object AddFriends0
       extends QueryContentsAppender[
-        String, LinkedPersonLift, LinkedPerson] {
+        Name, LinkedPersonLift, LinkedPerson] {
     override def appendTo[RA, A, C[_]](
         qwe: QWE[RA, A, C])(
         implicit aShape: FlattishShape[RA, A])
@@ -39,15 +41,16 @@ object Queries {
 
 
 
+
   // TODO: Instead of using `Users` and `UsersRow`, this could better take a
   //  `QueryWithExtractor[UserLift, User]` to maximize
   //  reusability and compositionality.
   class AddLinkedPersons[_RA, _A, _C[_]](
       users: QueryWithExtractor[_RA, _A, _C, Users, UsersRow],
-      relType: String*)
+      relType: Relationship*)
       extends QueryContentsAppender[
-        String, LinkedPersonLift, LinkedPerson] {
-    private val allowedRelationships: Option[Rep[List[String]]] =
+        Name, LinkedPersonLift, LinkedPerson] {
+    private val allowedRelationships: Option[Rep[List[Relationship]]] =
       if (relType.nonEmpty) Some(relType.toList) else None
 
     override def appendTo[RA, A, C[_]](
@@ -78,13 +81,19 @@ object Queries {
         }
     }
   }
+
+
+
+  // Helper methods to construct the Appenders
   object AddLinkedPersons {
-    def apply(relType: String*) =
+    def apply(relType: Relationship*) =
       new AddLinkedPersons(Users.asIs, relType: _*)
-    def apply(users: Query[Users, UsersRow, Seq], relType: String*) =
+    def apply(users: Query[Users, UsersRow, Seq], relType: Relationship*) =
       new AddLinkedPersons(users.asIs, relType: _*)
   }
 
+
+  // Pre-created appenders
   val AddLinked = AddLinkedPersons()
   val AddFriends = AddLinkedPersons("FRIEND")
 
@@ -97,14 +106,16 @@ object Queries {
   // the friends of at least some threshold number of other people
   // (not including family and spouses)
   class OnlyPopular(threshold: Int)
-      extends QueryContentsFilter[String] {
-    val popular =
+      extends QueryContentsFilter[Name] {
+
+    private[this] val popular = {
       Relationships
         .filter(_.relType === "FRIEND")
-      .groupBy(_.to)
-      .map { case (to, group) => (to, group.size) }
-      .filter { case (to, count) => count >= threshold }
-      .map { case (to, _) => to }
+        .groupBy(_.to)
+        .map { case (to, group) => (to, group.size) }
+        .filter { case (to, count) => count >= threshold }
+        .map { case (to, _) => to }
+    }
 
     override def filter[RA, A, C[_]](
         qwe: QWE[RA, A, C])(
@@ -114,6 +125,8 @@ object Queries {
         .filter { a => qwe.extract(a).in(popular) }
     }
   }
+
+  // Helpers to create Filters
   object OnlyPopular {
     def apply(threshold: Int = 4): OnlyPopular = new OnlyPopular(threshold)
   }
